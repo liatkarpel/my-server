@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bookmark Manager</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #0a0a0a;
+      color: #f0f0f0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+
+    h1 {
+      font-size: 4rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 6px;
+      color: #ffffff;
+      text-shadow: 0 0 20px #1a6fff, 0 0 40px #1a6fff55;
+      border-bottom: 4px solid #1a6fff;
+      display: inline-block;
+      padding-bottom: 12px;
+    }
+
+    .subtitle {
+      margin-top: 14px;
+      font-size: 1rem;
+      color: #888;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .card {
+      max-width: 640px;
+      margin: 0 auto;
+      background: #111;
+      border: 3px solid #1a6fff;
+      border-radius: 4px;
+      padding: 40px;
+      box-shadow: 0 0 30px #1a6fff33, inset 0 0 20px #00000066;
+    }
+
+    .card h2 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: #1a6fff;
+      margin-bottom: 30px;
+      border-left: 5px solid #ff6a00;
+      padding-left: 12px;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #aaa;
+      margin-bottom: 8px;
+    }
+
+    input[type="text"],
+    input[type="url"],
+    select {
+      width: 100%;
+      padding: 14px 16px;
+      background: #1a1a1a;
+      border: 2px solid #1a6fff;
+      border-radius: 2px;
+      color: #f0f0f0;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+
+    input[type="text"]:focus,
+    input[type="url"]:focus,
+    select:focus {
+      border-color: #ff6a00;
+      box-shadow: 0 0 0 3px #ff6a0033;
+    }
+
+    select option {
+      background: #1a1a1a;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+    }
+
+    button {
+      flex: 1;
+      padding: 16px;
+      font-size: 0.9rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      border: none;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.2s;
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+
+    .btn-primary {
+      background: #ff6a00;
+      color: #fff;
+      box-shadow: 0 4px 20px #ff6a0055;
+    }
+
+    .btn-primary:hover {
+      background: #ff8533;
+      box-shadow: 0 4px 28px #ff6a0099;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: #1a6fff;
+      border: 2px solid #1a6fff;
+    }
+
+    .btn-secondary:hover {
+      background: #1a6fff22;
+    }
+
+    /* Bookmarks list */
+    #bookmarks-section {
+      max-width: 640px;
+      margin: 40px auto 0;
+    }
+
+    #bookmarks-section h2 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: #1a6fff;
+      margin-bottom: 20px;
+      border-left: 5px solid #ff6a00;
+      padding-left: 12px;
+    }
+
+    #bookmark-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .bookmark-item {
+      background: #111;
+      border: 2px solid #1a6fff;
+      border-radius: 2px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 0 10px #1a6fff22;
+    }
+
+    .bookmark-info {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .bookmark-title {
+      font-weight: 700;
+      font-size: 1rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .bookmark-title a {
+      color: #f0f0f0;
+      text-decoration: none;
+    }
+
+    .bookmark-title a:hover {
+      color: #1a6fff;
+    }
+
+    .bookmark-meta {
+      display: flex;
+      gap: 10px;
+      margin-top: 4px;
+      align-items: center;
+    }
+
+    .bookmark-url {
+      font-size: 0.78rem;
+      color: #555;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 300px;
+    }
+
+    .bookmark-category {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      background: #ff6a00;
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 2px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .item-actions {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .btn-edit,
+    .btn-delete {
+      background: transparent;
+      border: 2px solid #444;
+      color: #666;
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      flex: none;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .btn-edit:hover {
+      border-color: #1a6fff;
+      color: #1a6fff;
+      box-shadow: none;
+    }
+
+    .btn-delete:hover {
+      border-color: #ff3333;
+      color: #ff3333;
+      box-shadow: none;
+    }
+
+    /* Inline edit form */
+    .bookmark-item.editing {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+      border-color: #ff6a00;
+      box-shadow: 0 0 14px #ff6a0033;
+    }
+
+    .edit-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .edit-form input,
+    .edit-form select {
+      width: 100%;
+      padding: 10px 12px;
+      background: #1a1a1a;
+      border: 2px solid #1a6fff;
+      border-radius: 2px;
+      color: #f0f0f0;
+      font-size: 0.9rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .edit-form input:focus,
+    .edit-form select:focus {
+      border-color: #ff6a00;
+      box-shadow: 0 0 0 3px #ff6a0033;
+    }
+
+    .edit-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-save {
+      flex: 1;
+      padding: 10px;
+      background: #ff6a00;
+      color: #fff;
+      border: none;
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-save:hover {
+      background: #ff8533;
+    }
+
+    .btn-cancel {
+      flex: 1;
+      padding: 10px;
+      background: transparent;
+      color: #666;
+      border: 2px solid #333;
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .btn-cancel:hover {
+      border-color: #666;
+      color: #aaa;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #444;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      border: 2px dashed #222;
+    }
+
+    .category-group {
+      margin-bottom: 32px;
+    }
+
+    .category-heading {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .category-heading-label {
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: #ff6a00;
+    }
+
+    .category-count {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #555;
+      letter-spacing: 1px;
+    }
+
+    .category-toggle {
+      margin-left: auto;
+      font-size: 0.7rem;
+      color: #444;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+
+    .category-heading:hover .category-toggle {
+      color: #1a6fff;
+    }
+
+    .category-heading::before {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #222;
+      order: 2;
+    }
+
+    .category-heading-label { order: 1; }
+    .category-count         { order: 3; }
+    .category-toggle        { order: 4; }
+
+    .category-items {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .category-items.collapsed {
+      display: none;
+    }
+
+    /* Search bar */
+    #search-bar {
+      max-width: 640px;
+      margin: 32px auto 0;
+      display: flex;
+      gap: 10px;
+    }
+
+    #search-input {
+      flex: 1;
+      padding: 14px 16px;
+      background: #1a1a1a;
+      border: 2px solid #1a6fff;
+      border-radius: 2px;
+      color: #f0f0f0;
+      font-size: 1rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    #search-input:focus {
+      border-color: #ff6a00;
+      box-shadow: 0 0 0 3px #ff6a0033;
+    }
+
+    #search-input::placeholder {
+      color: #444;
+    }
+
+    #search-clear {
+      padding: 14px 18px;
+      background: transparent;
+      border: 2px solid #333;
+      color: #555;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      flex: none;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    #search-clear:hover {
+      border-color: #ff6a00;
+      color: #ff6a00;
+    }
+
+    .highlight {
+      background: #ff6a00;
+      color: #fff;
+      border-radius: 2px;
+      padding: 0 2px;
+    }
+
+    #search-summary {
+      max-width: 640px;
+      margin: 10px auto 0;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #555;
+      min-height: 1em;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Bookmark Manager</h1>
+    <p class="subtitle">Save &amp; organize your web</p>
+  </header>
+
+  <div class="card">
+    <h2>Add Bookmark</h2>
+    <form id="bookmark-form">
+
+      <div class="form-group">
+        <label for="url">URL</label>
+        <input type="url" id="url" name="url" placeholder="https://example.com" required>
+      </div>
+
+      <div class="form-group">
+        <label for="title">Title</label>
+        <input type="text" id="title" name="title" placeholder="Page title" required>
+      </div>
+
+      <div class="form-group">
+        <label for="category">Category</label>
+        <select id="category" name="category">
+          <option value="">-- Select a category --</option>
+          <option value="development">Development</option>
+          <option value="design">Design</option>
+          <option value="news">News</option>
+          <option value="tools">Tools</option>
+          <option value="research">Research</option>
+          <option value="entertainment">Entertainment</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div class="button-row">
+        <button type="submit" class="btn-primary">Save Bookmark</button>
+        <button type="reset" class="btn-secondary">Clear</button>
+      </div>
+
+    </form>
+  </div>
+
+  <div id="search-bar">
+    <input type="text" id="search-input" placeholder="Search by title, URL or category...">
+    <button id="search-clear">Clear</button>
+  </div>
+  <div id="search-summary"></div>
+
+  <section id="bookmarks-section">
+    <h2>Saved Bookmarks</h2>
+    <div id="bookmark-list"></div>
+  </section>
+
+  <script>
+    const STORAGE_KEY = 'bookmarks';
+
+    function load() {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    }
+
+    function save(bookmarks) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(bookmarks));
+    }
+
+    function getQuery() {
+      return document.getElementById('search-input').value.trim().toLowerCase();
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function highlight(text, query) {
+      if (!query) return escapeHtml(text);
+      const escaped = escapeHtml(text);
+      const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      return escaped.replace(new RegExp(`(${escapedQuery})`, 'gi'), '<mark class="highlight">$1</mark>');
+    }
+
+    function render() {
+      const bookmarks = load();
+      const query = getQuery();
+      const list = document.getElementById('bookmark-list');
+      const summary = document.getElementById('search-summary');
+
+      if (bookmarks.length === 0) {
+        list.innerHTML = '<div class="empty-state">No bookmarks yet — add one above</div>';
+        summary.textContent = '';
+        return;
+      }
+
+      const filtered = bookmarks
+        .map((b, i) => ({ ...b, originalIndex: i }))
+        .filter(b => {
+          if (!query) return true;
+          return b.title.toLowerCase().includes(query) ||
+                 b.url.toLowerCase().includes(query) ||
+                 (b.category || '').toLowerCase().includes(query);
+        });
+
+      if (query) {
+        summary.textContent = `${filtered.length} result${filtered.length !== 1 ? 's' : ''} for "${query}"`;
+      } else {
+        summary.textContent = '';
+      }
+
+      if (filtered.length === 0) {
+        list.innerHTML = '<div class="empty-state">No bookmarks match your search</div>';
+        return;
+      }
+
+      const groups = {};
+      filtered.forEach(b => {
+        const key = b.category || 'uncategorized';
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(b);
+      });
+
+      const categoryOrder = Object.keys(groups).sort((a, b) =>
+        a === 'uncategorized' ? 1 : b === 'uncategorized' ? -1 : a.localeCompare(b)
+      );
+
+      list.innerHTML = categoryOrder.map(cat => `
+        <div class="category-group">
+          <div class="category-heading" onclick="toggleGroup(this)">
+            <span class="category-heading-label">${highlight(cat, query)}</span>
+            <span class="category-count">${groups[cat].length} bookmark${groups[cat].length !== 1 ? 's' : ''}</span>
+            <span class="category-toggle">collapse</span>
+          </div>
+          <div class="category-items">
+            ${groups[cat].map(b => `
+              <div class="bookmark-item" data-index="${b.originalIndex}">
+                <div class="bookmark-info">
+                  <div class="bookmark-title">
+                    <a href="${escapeHtml(b.url)}" target="_blank" rel="noopener">${highlight(b.title, query)}</a>
+                  </div>
+                  <div class="bookmark-meta">
+                    <span class="bookmark-url">${highlight(b.url, query)}</span>
+                  </div>
+                </div>
+                <div class="item-actions">
+                  <button class="btn-edit" onclick="startEdit(${b.originalIndex})">Edit</button>
+                  <button class="btn-delete" onclick="deleteBookmark(${b.originalIndex})">Delete</button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function toggleGroup(heading) {
+      const items = heading.nextElementSibling;
+      const toggle = heading.querySelector('.category-toggle');
+      const collapsed = items.classList.toggle('collapsed');
+      toggle.textContent = collapsed ? 'expand' : 'collapse';
+    }
+
+    const CATEGORIES = ['development','design','news','tools','research','entertainment','other'];
+
+    function startEdit(index) {
+      const item = document.querySelector(`.bookmark-item[data-index="${index}"]`);
+      if (!item) return;
+      const b = load()[index];
+
+      item.classList.add('editing');
+      item.innerHTML = `
+        <div class="edit-form">
+          <input type="url" class="edit-url" value="${escapeHtml(b.url)}" placeholder="URL" required>
+          <input type="text" class="edit-title" value="${escapeHtml(b.title)}" placeholder="Title" required>
+          <select class="edit-category">
+            <option value="">-- No category --</option>
+            ${CATEGORIES.map(c => `<option value="${c}" ${b.category === c ? 'selected' : ''}>${c.charAt(0).toUpperCase() + c.slice(1)}</option>`).join('')}
+          </select>
+          <div class="edit-actions">
+            <button class="btn-save" onclick="saveEdit(${index})">Save</button>
+            <button class="btn-cancel" onclick="render()">Cancel</button>
+          </div>
+        </div>
+      `;
+      item.querySelector('.edit-url').focus();
+    }
+
+    function saveEdit(index) {
+      const item = document.querySelector(`.bookmark-item[data-index="${index}"]`);
+      const url = item.querySelector('.edit-url').value.trim();
+      const title = item.querySelector('.edit-title').value.trim();
+      const category = item.querySelector('.edit-category').value;
+      if (!url || !title) return;
+
+      const bookmarks = load();
+      bookmarks[index] = { ...bookmarks[index], url, title, category };
+      save(bookmarks);
+      render();
+    }
+
+    function deleteBookmark(index) {
+      const bookmarks = load();
+      bookmarks.splice(index, 1);
+      save(bookmarks);
+      render();
+    }
+
+    document.getElementById('search-input').addEventListener('input', render);
+
+    document.getElementById('search-clear').addEventListener('click', function() {
+      document.getElementById('search-input').value = '';
+      render();
+    });
+
+    document.getElementById('bookmark-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const bookmarks = load();
+      bookmarks.unshift({
+        url: document.getElementById('url').value.trim(),
+        title: document.getElementById('title').value.trim(),
+        category: document.getElementById('category').value,
+        savedAt: Date.now()
+      });
+      save(bookmarks);
+      this.reset();
+      render();
+    });
+
+    render();
+  </script>
+
+</body>
+</html>
