@@ -17,6 +17,11 @@ app.get('/about', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'about.html'));
 });
 
+// GET /contact — Contact page
+app.get('/contact', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'contact.html'));
+});
+
 // GET /api/time — Current time as JSON
 app.get('/api/time', (req, res) => {
   const now = new Date();
