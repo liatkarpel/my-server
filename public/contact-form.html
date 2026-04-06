@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 14px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+
+    .card h1 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+
+    .card p.subtitle {
+      font-size: 0.9rem;
+      color: #888;
+      margin-bottom: 1.75rem;
+    }
+
+    .field {
+      margin-bottom: 1.25rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 0.35rem;
+      color: #444;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 0.6rem 0.875rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      color: #333;
+      background: #fafafa;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      outline: none;
+    }
+
+    input:focus, textarea:focus {
+      border-color: #0066cc;
+      box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
+      background: #fff;
+    }
+
+    input::placeholder, textarea::placeholder {
+      color: #bbb;
+    }
+
+    input.invalid, textarea.invalid {
+      border-color: #cc3300;
+      background: #fff8f7;
+    }
+
+    input.invalid:focus, textarea.invalid:focus {
+      box-shadow: 0 0 0 3px rgba(204,51,0,0.1);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    .error {
+      font-size: 0.8rem;
+      color: #cc3300;
+      margin-top: 0.35rem;
+      display: none;
+    }
+
+    .error.visible {
+      display: block;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 0.7rem;
+      background: #0066cc;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.15s;
+      margin-top: 0.5rem;
+    }
+
+    button[type="submit"]:hover {
+      background: #0055aa;
+    }
+
+    /* Success state */
+    .success {
+      display: none;
+      text-align: center;
+      padding: 1rem 0;
+    }
+
+    .success.visible {
+      display: block;
+    }
+
+    .success-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .success h2 {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .success p {
+      color: #888;
+      font-size: 0.9rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .success button {
+      background: none;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 0.5rem 1.25rem;
+      font-size: 0.9rem;
+      font-family: inherit;
+      color: #555;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .success button:hover {
+      background: #f5f5f5;
+    }
+
+    /* Dark mode */
+    @media (prefers-color-scheme: dark) {
+      body { background: #1a1a1a; }
+
+      .card {
+        background: #242424;
+        border-color: #333;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+      }
+
+      .card h1 { color: #f0f0f0; }
+      .card p.subtitle { color: #666; }
+
+      label { color: #aaa; }
+
+      input, textarea {
+        background: #2e2e2e;
+        border-color: #444;
+        color: #e0e0e0;
+      }
+
+      input:focus, textarea:focus {
+        border-color: #4d9fff;
+        box-shadow: 0 0 0 3px rgba(77,159,255,0.15);
+        background: #333;
+      }
+
+      input::placeholder, textarea::placeholder { color: #555; }
+
+      input.invalid, textarea.invalid {
+        border-color: #cc3300;
+        background: #2a1a17;
+      }
+
+      button[type="submit"] { background: #0055aa; }
+      button[type="submit"]:hover { background: #004499; }
+
+      .success button {
+        border-color: #444;
+        color: #aaa;
+      }
+
+      .success button:hover { background: #2e2e2e; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div id="form-section">
+      <h1>Contact Us</h1>
+      <p class="subtitle">Fill out the form below and we'll get back to you.</p>
+
+      <form id="contact-form" novalidate>
+        <div class="field">
+          <label for="name">Name <span style="color:#cc3300">*</span></label>
+          <input type="text" id="name" placeholder="Jane Smith" autocomplete="name">
+          <p class="error" id="name-error"></p>
+        </div>
+
+        <div class="field">
+          <label for="email">Email <span style="color:#cc3300">*</span></label>
+          <input type="email" id="email" placeholder="jane@example.com" autocomplete="email">
+          <p class="error" id="email-error"></p>
+        </div>
+
+        <div class="field">
+          <label for="message">Message</label>
+          <textarea id="message" placeholder="How can we help?"></textarea>
+        </div>
+
+        <button type="submit">Send Message</button>
+      </form>
+    </div>
+
+    <div class="success" id="success-section">
+      <div class="success-icon">&#10003;</div>
+      <h2>Message sent!</h2>
+      <p>Thanks for reaching out. We'll be in touch soon.</p>
+      <button id="reset-btn">Send another</button>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('contact-form');
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const messageInput = document.getElementById('message');
+    const formSection = document.getElementById('form-section');
+    const successSection = document.getElementById('success-section');
+
+    function showError(input, errorEl, msg) {
+      input.classList.add('invalid');
+      errorEl.textContent = msg;
+      errorEl.classList.add('visible');
+    }
+
+    function clearError(input, errorEl) {
+      input.classList.remove('invalid');
+      errorEl.classList.remove('visible');
+    }
+
+    function isValidEmail(value) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    }
+
+    // Validate on blur for immediate feedback
+    nameInput.addEventListener('blur', () => validateName());
+    emailInput.addEventListener('blur', () => validateEmail());
+
+    // Clear errors as user types
+    nameInput.addEventListener('input', () => {
+      if (nameInput.value.trim()) clearError(nameInput, document.getElementById('name-error'));
+    });
+    emailInput.addEventListener('input', () => {
+      if (isValidEmail(emailInput.value.trim())) clearError(emailInput, document.getElementById('email-error'));
+    });
+
+    function validateName() {
+      const nameError = document.getElementById('name-error');
+      if (!nameInput.value.trim()) {
+        showError(nameInput, nameError, 'Name is required.');
+        return false;
+      }
+      clearError(nameInput, nameError);
+      return true;
+    }
+
+    function validateEmail() {
+      const emailError = document.getElementById('email-error');
+      const value = emailInput.value.trim();
+      if (!value) {
+        showError(emailInput, emailError, 'Email is required.');
+        return false;
+      }
+      if (!isValidEmail(value)) {
+        showError(emailInput, emailError, 'Please enter a valid email address.');
+        return false;
+      }
+      clearError(emailInput, emailError);
+      return true;
+    }
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const nameOk = validateName();
+      const emailOk = validateEmail();
+      if (!nameOk || !emailOk) return;
+
+      formSection.style.display = 'none';
+      successSection.classList.add('visible');
+    });
+
+    document.getElementById('reset-btn').addEventListener('click', () => {
+      form.reset();
+      [nameInput, emailInput, messageInput].forEach(el => el.classList.remove('invalid'));
+      document.querySelectorAll('.error').forEach(el => el.classList.remove('visible'));
+      formSection.style.display = '';
+      successSection.classList.remove('visible');
+    });
+  </script>
+</body>
+</html>

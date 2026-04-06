@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bookmarks</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 0 2rem;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    header h1 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #111;
+    }
+
+    main {
+      max-width: 640px;
+      margin: 40px auto;
+      padding: 0 1.5rem;
+    }
+
+    /* Form */
+    .add-form {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+
+    .add-form h2 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #999;
+      margin-bottom: 1rem;
+    }
+
+    .form-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.6rem 0.875rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      color: #333;
+      background: #fafafa;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #0066cc;
+      box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
+      background: #fff;
+    }
+
+    input::placeholder {
+      color: #bbb;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 0.65rem;
+      background: #0066cc;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.15s;
+      margin-top: 0.25rem;
+    }
+
+    button[type="submit"]:hover {
+      background: #0055aa;
+    }
+
+    /* Error */
+    .error {
+      font-size: 0.85rem;
+      color: #cc3300;
+      margin-top: 0.5rem;
+      display: none;
+    }
+
+    .error.visible {
+      display: block;
+    }
+
+    /* Bookmark list */
+    .list-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+
+    .list-header h2 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #999;
+    }
+
+    .count {
+      font-size: 0.8rem;
+      background: #e8e8e8;
+      color: #666;
+      padding: 0.15rem 0.5rem;
+      border-radius: 99px;
+    }
+
+    .search-wrap {
+      position: relative;
+      margin-bottom: 1rem;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #bbb;
+      pointer-events: none;
+    }
+
+    #search-input {
+      padding-left: 2.25rem;
+    }
+
+    .empty {
+      text-align: center;
+      color: #aaa;
+      font-size: 0.95rem;
+      padding: 3rem 0;
+    }
+
+    .bookmark-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .bookmark {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 0.875rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.875rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      transition: box-shadow 0.15s;
+    }
+
+    .bookmark:hover {
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .favicon {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      flex-shrink: 0;
+      background: #f0f0f0;
+    }
+
+    .bookmark-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .bookmark-title {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #111;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .bookmark-url {
+      font-size: 0.8rem;
+      color: #999;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 0.1rem;
+    }
+
+    .bookmark a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .bookmark a:hover .bookmark-title {
+      color: #0066cc;
+    }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #ccc;
+      font-size: 1.1rem;
+      padding: 0.25rem;
+      border-radius: 6px;
+      line-height: 1;
+      transition: color 0.15s, background 0.15s;
+      flex-shrink: 0;
+    }
+
+    .delete-btn:hover {
+      color: #cc3300;
+      background: #fff0ed;
+    }
+
+    /* Dark mode */
+    @media (prefers-color-scheme: dark) {
+      body { background: #1a1a1a; color: #e0e0e0; }
+
+      header {
+        background: #242424;
+        border-bottom-color: #333;
+      }
+
+      header h1 { color: #f0f0f0; }
+
+      .add-form, .bookmark {
+        background: #242424;
+        border-color: #333;
+      }
+
+      input {
+        background: #2e2e2e;
+        border-color: #444;
+        color: #e0e0e0;
+      }
+
+      input:focus {
+        border-color: #4d9fff;
+        box-shadow: 0 0 0 3px rgba(77,159,255,0.15);
+        background: #333;
+      }
+
+      input::placeholder { color: #666; }
+
+      button[type="submit"] { background: #0055aa; }
+      button[type="submit"]:hover { background: #004499; }
+
+      .count { background: #333; color: #888; }
+
+      .search-wrap svg { color: #555; }
+
+      .bookmark-title { color: #f0f0f0; }
+      .bookmark-url { color: #666; }
+
+      .bookmark a:hover .bookmark-title { color: #4d9fff; }
+
+      .delete-btn { color: #555; }
+      .delete-btn:hover { color: #ff6644; background: #2e1a17; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Bookmarks</h1>
+  </header>
+
+  <main>
+    <div class="add-form">
+      <h2>Add Bookmark</h2>
+      <form id="bookmark-form" class="form-row">
+        <input type="text" id="title-input" placeholder="Title" autocomplete="off">
+        <input type="url" id="url-input" placeholder="https://example.com" autocomplete="off">
+        <p class="error" id="error-msg"></p>
+        <button type="submit">Add Bookmark</button>
+      </form>
+    </div>
+
+    <div class="search-wrap">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="text" id="search-input" placeholder="Search bookmarks…" autocomplete="off">
+    </div>
+
+    <div class="list-header">
+      <h2>Saved</h2>
+      <span class="count" id="count">0</span>
+    </div>
+
+    <div id="bookmark-list" class="bookmark-list"></div>
+  </main>
+
+  <script>
+    const form = document.getElementById('bookmark-form');
+    const titleInput = document.getElementById('title-input');
+    const urlInput = document.getElementById('url-input');
+    const listEl = document.getElementById('bookmark-list');
+    const countEl = document.getElementById('count');
+    const errorMsg = document.getElementById('error-msg');
+    const searchInput = document.getElementById('search-input');
+
+    function load() {
+      return JSON.parse(localStorage.getItem('bookmarks') || '[]');
+    }
+
+    function save(bookmarks) {
+      localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+    }
+
+    function getFaviconUrl(url) {
+      try {
+        const { origin } = new URL(url);
+        return `${origin}/favicon.ico`;
+      } catch {
+        return '';
+      }
+    }
+
+    function render() {
+      const bookmarks = load();
+      const query = searchInput.value.trim().toLowerCase();
+      const filtered = query
+        ? bookmarks.filter(b => b.title.toLowerCase().includes(query))
+        : bookmarks;
+
+      countEl.textContent = bookmarks.length;
+
+      if (bookmarks.length === 0) {
+        listEl.innerHTML = '<p class="empty">No bookmarks yet. Add one above.</p>';
+        return;
+      }
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = '<p class="empty">No bookmarks match your search.</p>';
+        return;
+      }
+
+      listEl.innerHTML = filtered.map((b, i) => `
+        <div class="bookmark" data-index="${bookmarks.indexOf(b)}">
+          <img class="favicon" src="${getFaviconUrl(b.url)}" alt=""
+               onerror="this.style.visibility='hidden'">
+          <a href="${b.url}" target="_blank" rel="noopener" class="bookmark-info">
+            <div class="bookmark-title">${highlight(escapeHtml(b.title), escapeHtml(query))}</div>
+            <div class="bookmark-url">${escapeHtml(b.url)}</div>
+          </a>
+          <button class="delete-btn" data-index="${bookmarks.indexOf(b)}" title="Delete">&#x2715;</button>
+        </div>
+      `).join('');
+    }
+
+    function highlight(text, query) {
+      if (!query) return text;
+      const re = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+      return text.replace(re, '<mark style="background:#fff3b0;border-radius:2px;padding:0 1px">$1</mark>');
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, c => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[c]));
+    }
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const title = titleInput.value.trim();
+      const url = urlInput.value.trim();
+
+      if (!title || !url) {
+        showError('Please fill in both fields.');
+        return;
+      }
+
+      try {
+        new URL(url);
+      } catch {
+        showError('Please enter a valid URL (e.g. https://example.com).');
+        return;
+      }
+
+      hideError();
+      const bookmarks = load();
+      bookmarks.unshift({ title, url });
+      save(bookmarks);
+      render();
+      form.reset();
+      titleInput.focus();
+    });
+
+    listEl.addEventListener('click', e => {
+      const btn = e.target.closest('.delete-btn');
+      if (!btn) return;
+      const i = Number(btn.dataset.index);
+      const bookmarks = load();
+      bookmarks.splice(i, 1);
+      save(bookmarks);
+      render();
+    });
+
+    function showError(msg) {
+      errorMsg.textContent = msg;
+      errorMsg.classList.add('visible');
+    }
+
+    function hideError() {
+      errorMsg.classList.remove('visible');
+    }
+
+    searchInput.addEventListener('input', render);
+
+    render();
+  </script>
+</body>
+</html>
